@@ -1,0 +1,157 @@
+<!--
+The MIT License (MIT)
+
+Copyright (c) 2014 Xavier Hardy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Tutorial</title>
+<!-- Import that --> 
+<script language="javascript" src="./kinetic/kinetic.js"></script>
+<script language="javascript" src="./jquery/jquery-1.7.1.min.js"></script>
+<script language="javascript" src="./js/misc.js"></script>
+<script language="javascript" src="./js/gfx/drawnobject.js"></script>
+<!-- And depending on what you want to use, import here --> 
+<script language="javascript" src="./js/gfx/bar.js"></script>
+<script language="javascript" src="./js/gfx/round.js"></script>
+<script language="javascript" src="./js/gfx/volume.js"></script>
+<script language="javascript" src="./js/gfx/plot.js"></script>
+<script language="javascript" src="./js/gfx/histogram2.js"></script>
+
+<script language="javascript">
+    //Don't try to move that
+		var kin = null;								// we need to do animations
+		var buffer = null;						// a buffer <canvas> to draw what is not usually updated
+		var buffContext = null;				// its "context"
+		//var textBuffer = null;						// a buffer <canvas> to draw rotated texts (you need to rotate the whole canvas to have a rotated text)
+		//var textBuffContext = null;				// its "context"
+		var buffUse = null;						// define buffer use in space
+		var objectArray = null;				// all our drawn objects
+		var canvas = null;						// all our canvas
+		
+		function init(){
+			// instantiate new animation object (once)
+			kin = new Kinetic("canvas0", "2d");
+			// instantiate the array containing our drawn objects and canvas (once)
+			objectArray = new Array();
+			canvas = new Array();
+			// create a <canvas> called buffer (once)
+			buffer =  document.getElementById("buffer");
+			buffContext =  buffer.getContext('2d');
+			bufferUse = {x: 20, y1: 20, y2: 20};
+			
+			/*// this is buffer to draw rotated text
+			textBuffer =  document.getElementById("textbuffer");
+			textBuffContext =  textBuffer.getContext('2d');*/
+			
+			// for each objects, define a new canvas, but you don't need to define a new buffer, it will automatically add it to the buffer
+			canvas[0] =  document.getElementById("canvas0");
+			objectArray[0] = new Bar(canvas[0]); // bar meter
+			
+			canvas[1] =  document.getElementById("canvas1");
+			objectArray[1] = new Round(canvas[1]); // round meter
+			
+			canvas[2] =  document.getElementById("canvas2");
+			objectArray[2] = new VolumeBar(canvas[2]); // volume meter
+			
+			// The next few parameters work for these three widgets
+			
+			// Changes the cursor to 0.5 (with a nice animation)
+			objectArray[0].nextCursor = 0.5; 
+			
+			// Changes the color sections
+			objectArray[1].colors = [new Section(0.2,"#FF00FF"), new Section(0.7, "#CCFFAA"), new Section(1,"#444499")]; // Read it like this: end of 1st section at 0.2 [20% of total bar] and magenta color, 2nd section ends at 0.6 and weird green... always end with a section ending at 1
+			objectArray[1].drawBackground(); // You MUST redraw the background for this change to effect
+						
+			//Other widgets
+			canvas[3] =  document.getElementById("canvas3");
+			objectArray[3] = new Plot(canvas[3]); // plot
+			
+			canvas[4] =  document.getElementById("canvas4");
+			objectArray[4] = new Histogram(canvas[4]); // histogram
+			
+			kin.setDrawStage(function(){ //It runs the animation, do not touch
+				context = kin.getContext();
+				updateStage();
+				kin.clear();
+				draw();	
+			});
+ 
+			kin.startAnimation();
+		}
+		
+		function updateStage(){ //It updates the attributes, do not touch
+		  var n = objectArray.length;
+		  for (var i = 0; i < n; i++){
+        objectArray[i].update();
+      }
+		}
+		
+		function draw(){ //It draws everything, do not touch
+		  var n = objectArray.length;
+		  for (var i = 0; i < n; i++){
+        objectArray[i].draw();
+      }
+		}
+	</script>
+</head>			
+<body style="background-color:#FFFFFF">
+	<p>Bar meter</p>
+	<div>
+		<canvas id='canvas0' width=250 height=250>
+			<div class="nohtml5">If you see this message your web browser doesn't support HTML5. Please download the latest version of <a href="http://windows.microsoft.com/en-us/internet-explorer/products/ie/home">Internet Explorer</a>, <a href="http://www.mozilla.org/en-US/firefox/fx/">Mozilla Firefox</a> (or <a href="http://www.geticeweasel.org/">Iceweasel</a>), <a href="https://www.google.com/chrome/">Google Chrome</a> (or <a href="http://www.chromium.org/">Chromium</a>) or <a href="http://www.apple.com/safari/">Safari</a>.</div>  <!-- Don't remove this message -->
+		</canvas>
+	</div>
+	
+	<p>Round meter</p>
+	<div>
+		<canvas id='canvas1' width=450 height=220>
+			<div class="nohtml5">If you see this message, please update your web browser (it doesn't support HTML5).</div>  <!-- Don't remove this message -->
+		</canvas>
+	</div>
+	
+	<p>Volume meter</p>
+	<div>
+		<canvas id='canvas2' width=250 height=50>
+			<div class="nohtml5">If you see this message, please update your web browser (it doesn't support HTML5).</div>  <!-- Don't remove this message -->
+		</canvas>
+	</div>
+	
+	<p>Plot</p>
+	<div>
+		<canvas id='canvas3' width=330 height=250>
+			<div class="nohtml5">If you see this message, please update your web browser (it doesn't support HTML5).</div>  <!-- Don't remove this message -->
+		</canvas>
+	</div>
+	
+	<p>Histogram</p>
+	<div>
+		<canvas id='canvas4' width=330 height=250>
+			<div class="nohtml5">If you see this message, please update your web browser (it doesn't support HTML5).</div>  <!-- Don't remove this message -->
+		</canvas>
+	</div>
+	
+	<canvas id='buffer' width=1000 height=1000 style="style=width:0; height:0;">Define it in the css as hidden but do not modify directly "width" and "height" attributes in HTML --></canvas>
+	</body>
+	<script language="javascript">init();</script>
+</html>

@@ -1,0 +1,379 @@
+<!--
+The MIT License (MIT)
+
+Copyright (c) 2014 Xavier Hardy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Test</title>
+<!-- Import that --> 
+<script language="javascript" src="./kinetic/kinetic.js"></script>
+<script language="javascript" src="./js/misc.js"></script>
+<script language="javascript" src="./js/gfx/drawnobject.js"></script>
+<!-- And depending on what you want to use, import here --> 
+<script language="javascript" src="./js/gfx/bar.js"></script>
+<script language="javascript" src="./js/gfx/round.js"></script>
+<script language="javascript" src="./js/gfx/volume.js"></script>
+<script language="javascript" src="./js/gfx/plot.js"></script>
+
+<script language="javascript">
+    //Drawing objects		
+		var kin = null;
+		var canvas = null;
+		var context = null;
+		var buffer = null;
+		var buffContext = null;
+		
+		//Variables
+		var objectArray = null;
+				
+		onkeypress = function(e){
+			/*if(e){
+				e = e
+			} else {
+				e = window.event
+			}
+
+			if(e.which){
+				var keycode = e.which
+			} else {
+				var keycode = e.keyCode
+			}
+			var key = String.fromCharCode(keycode);
+			//draw_text(keycode + ' was pressed.',10,110,20,'#FF00FF');
+			for(i=0;i<nb_players;i++) {
+				player[i].key(keycode);
+			}*/
+		}		
+
+		function init(){
+		// instantiate new animation object
+			kin = new Kinetic("canvas", "2d");
+			canvas = document.getElementById('canvas');
+			buffer = document.getElementById('buffer');
+			context =  canvas.getContext('2d');
+			buffContext =  buffer.getContext('2d');
+			objectArray = new Array();
+			objectArray[0] = new Plot(canvas, context, 200, 100, 10, 0, 100, 10, 0, 100, 2, "#000000", 5, 1, 1, "10px sans-serif", [[0,10,0,10,50,20,50,20,100,50,100],[100,50,100,20,50,20,50,10,0,10,0]], ["#FF0000", "#0000FF"], 10, 10);
+			//objectArray[0] = new Plot(canvasContext, cursorx, cursory, w, h, startx, endx, starty, endy, borderSize, borderColor, cursorSize, plotSize, fontSize, values, colors, bufferX, bufferY);
+			//objectArray[0] = new Bar(context, 0.7, 100, 40, false, 10, "#FFFFFF", 6, [new Section(0.5,"#00FF00"), new Section(0.75, "#FFFF00"), new Section(1,"#FF0000")], 100, 100);
+			//objectArray[0] = new Round(context, 0.7, 100, 50, 30, 200, 5, "#FFFFFF", 6, [new Section(0.5,"#00FF00"), new Section(0.75, "#FFFF00"), new Section(1,"#FF0000")], false, 100, 100);
+			//objectArray[0] = new Bar(context, 100, 100, true, 0, 1, "#FFFFFF", [new Section(1,"#000000")], 250, 100);
+			//objectArray[1] = new Bar(context);
+
+			kin.setDrawStage(function(){
+				context = kin.getContext();
+				updateStage();
+				kin.clear();
+				draw();	
+			});
+ 
+			kin.startAnimation();
+		}
+		
+		function updateStage(){
+		  var n = objectArray.length;
+		  for (var i = 0; i < n; i++){
+        objectArray[i].update();
+      }
+		}
+		
+		function initialize(){
+		
+		}
+		
+		function draw(){
+		  var n = objectArray.length;
+		  for (var i = 0; i < n; i++){
+        objectArray[i].draw();
+      }
+			/*context.globalCompositeOperation = 'source-over';
+			context.strokeStyle = "#FFFFFF";
+			context.strokeRect(0,0,kin.canvas.width,kin.canvas.height);
+		  context.drawImage(buffer, 0, 0, size, size, pixel_x, pixel_y, size, size);			
+
+			context.globalCompositeOperation = 'source-over';
+			context.font = '20px Arial';
+			/text = "fps: " + (Math.round(1000/kin.getTimeInterval()));
+			context.fillStyle = "#FFFFFF";
+			context.fillText(text, 10, 30);
+			context.strokeStyle = "#000000";
+			context.strokeText(text, 10, 30); style='width:0;height:0;' >*/
+			}
+			
+			
+		//Page functions
+		function cursorChange(){
+			var element = document.getElementById('cursor');
+			var val = parseFloat(element.value);
+			if(isNaN(val) || val > 1)
+				element.value = 1;
+			else if (val < 0)
+				element.value = 0;
+			objectArray[0].nextCursor = parseFloat(element.value);
+		}
+		
+		function wChange(){
+			var element = document.getElementById('w');
+			var val = parseFloat(element.value);
+			if(isNaN(val))
+				element.value = 100;
+			else if (val < 1)
+				element.value = 1;
+			objectArray[0].clearBuffer();
+			objectArray[0].w = parseFloat(element.value);
+			objectArray[0].drawBackground();
+		}
+		
+		function hChange(){
+			var element = document.getElementById('h');
+			var val = parseFloat(element.value);
+			if(isNaN(val))
+				element.value = 100;
+			else if (val < 1)
+				element.value = 1;
+			objectArray[0].clearBuffer();
+			objectArray[0].h = parseFloat(element.value);
+			objectArray[0].drawBackground();
+		}
+		
+		function verticalChange(){
+			objectArray[0].clearBuffer();
+			objectArray[0].vertical = document.getElementById('vertical').checked == 1;
+			objectArray[0].drawBackground();
+		}
+		
+		function borderSizeChange(){
+			var element = document.getElementById('borderSize');
+			var val = parseFloat(element.value);
+			if(isNaN(val))
+				element.value = 6;
+			else if (val < 1)
+				element.value = 1;
+			objectArray[0].clearBuffer();
+			objectArray[0].borderSize = parseFloat(element.value);
+			objectArray[0].drawBackground();
+		}
+		
+		function cursorSizeChange(){
+			var element = document.getElementById('cursorSize');
+			var val = parseFloat(element.value);
+			if(isNaN(val))
+				element.value = 6;
+			else if (val < 1)
+				element.value = 1;
+			objectArray[0].setCursorSize(parseFloat(element.value));
+			objectArray[0].drawBackground();
+		}
+		
+		function speedChange(){
+			var element = document.getElementById('speed');
+			var val = parseFloat(element.value);
+			if(isNaN(val) || val < epsilon)
+				element.value = epsilon;
+			else if (val > 1)
+				element.value = 1;
+			objectArray[0].startSpeed = parseFloat(element.value);
+		}
+		
+		function borderColorChange(){
+			var colorComp = ['borderR','borderG','borderB'];
+			var color = '';
+			var n = colorComp.length;
+			for(var i = 0; i < n; i++){
+				var element = document.getElementById(colorComp[i]);
+				var val = parseInt(element.value);
+				if(isNaN(val) || val > 255)
+					element.value = 255;
+				else if(val < 0)
+					element.value = 0;
+				val = parseHex(element.value);
+				color += val;
+			}
+			objectArray[0].borderColor = '#' + color;
+			objectArray[0].drawBackground();
+		}
+		
+		function addSection(){
+			var sectionStart = parseFloat(document.getElementById("sectionstart").value);
+			var r = parseHex(document.getElementById("newR").value);
+			var g = parseHex(document.getElementById("newG").value);
+			var b = parseHex(document.getElementById("newB").value);
+			var section = new Section(1, "#" + r + g + b);
+			var objSections = objectArray[0].colors;
+			var n = objSections.length;
+			objSections[n-1].x = sectionStart;
+			objSections[n] = section;
+			objectArray[0].drawBackground();
+		}
+		
+		function removeSection(){
+			var objSections = objectArray[0].colors;
+			if(objSections.length > 1){
+				objSections.pop();
+				var n = objSections.length;
+				objSections[n-1].x = 1;
+				objectArray[0].drawBackground();
+			}
+		}
+		
+	function checkSection(element){
+		var objSections = objectArray[0].colors;
+		var n = objSections.length;
+		if(n > 1)
+				checkValue(element, objSections[n-2].x, 1, false);
+		else
+				checkValue(element, 0, 1, false);
+	}
+		
+	function outerRadiusChange(){
+		var element = document.getElementById('outerRadius');
+		var val = parseFloat(element.value);
+		if(isNaN(val))
+			element.value = 10;
+		objectArray[0].clearBuffer();
+		objectArray[0].outerRadius = parseFloat(element.value);
+		objectArray[0].drawBackground();
+	}
+		
+	function innerRadiusChange(){
+		var element = document.getElementById('innerRadius');
+		var val = parseFloat(element.value);
+		if(isNaN(val))
+			element.value = 10;
+		objectArray[0].clearBuffer();
+		objectArray[0].innerRadius = parseFloat(element.value);
+		objectArray[0].drawBackground();
+	}
+		
+	function startChange(){
+		var element = document.getElementById('start');
+		var val = parseFloat(element.value);
+		if(isNaN(val))
+			element.value = 10;
+		objectArray[0].clearBuffer();
+		objectArray[0].setStart(parseFloat(element.value));
+		objectArray[0].drawBackground();
+	}
+		
+	function separateSectionsChange(){
+		objectArray[0].clearBuffer();
+		objectArray[0].separateSections = document.getElementById('separateSections').checked == 1;
+		objectArray[0].drawBackground();
+	}
+		
+	function endChange(){
+		var element = document.getElementById('end');
+		var val = parseFloat(element.value);
+		if(isNaN(val))
+			element.value = 10;
+		objectArray[0].clearBuffer();
+		objectArray[0].setEnd(parseFloat(element.value));
+		objectArray[0].drawBackground();
+	}
+	
+	function darknessRatioChange(){
+		var element = document.getElementById('darknessRatio');
+		var val = parseFloat(element.value);
+		if(isNaN(val) || val > 1)
+			element.value = 1;
+		else if (val < 0)
+			element.value = 0;
+		objectArray[0].clearBuffer();
+		objectArray[0].darknessRatio = parseFloat(element.value);
+		objectArray[0].drawBackground();
+	}
+	
+	function nbBlocksChange(){
+		var element = document.getElementById('nbBlocks');
+		var val = parseInt(element.value);
+		if(isNaN(val) || val < 1)
+			element.value = 1;
+		objectArray[0].clearBuffer();
+		objectArray[0].nbBlocks = parseInt(element.value);
+		objectArray[0].drawBackground();
+	}
+	
+	function objectChange(){
+		var obj = objectArray[0];
+		obj.clearBuffer();
+		objectArray.pop();
+		var val = document.getElementById("objectselector").value;
+		if(val == "bar")
+			objectArray.push(new Bar(context, 0.7, 100, 40, false, 10, "#FFFFFF", 6, [new Section(0.5,"#00FF00"), new Section(0.75, "#FFFF00"), new Section(1,"#FF0000")], 100, 100));
+		else if(val == "volume")
+			objectArray.push(new VolumeBar(context, 0.7, 100, 40, true, 10, 0.5, 10, "#FFFFFF", 6, [new Section(0.5,"#00FF00"), new Section(0.75, "#FFFF00"), new Section(1,"#FF0000")], 100, 100));
+		else if(val == "round")
+			objectArray.push(new Round(context, 0.7, 100, 50, 30, 200, 5, "#FFFFFF", 6, [new Section(0.5,"#00FF00"), new Section(0.75, "#FFFF00"), new Section(1,"#FF0000")], false, 100, 100));
+		obj = objectArray[0];
+		var atrb = obj.attributes();
+		var i;
+		var n = atrb.length;
+		for(i = 0; i < n; i++)
+			document.getElementById(atrb[i]+"_container").hidden = false;
+		atrb = obj.hiddenAttributes();
+		n = atrb.length;
+		for(i = 0; i < n; i++)
+			document.getElementById(atrb[i]+"_container").hidden = true;
+	}
+	</script>
+</head>			
+<body style="background-color:#FFFFFF">
+	<canvas id='canvas' width=250 height=250>
+		fallback content
+	</canvas>
+	<p id="objectselector_container">Object :<select id="objectselector" name="objectselector" onChange="objectChange()">
+		<option value="bar">Bar meter</option>
+		<option value="round">Round meter</option>
+		<option value="volume">Volume Bar meter</option>
+	</select></p>
+	<p id="cursor_container">Cursor :<input type="text" id="cursor" name="cursor" onChange="cursorChange()" /></p>
+	<p id="outerRadius_container">Outer Radius :<input type="text" id="outerRadius" name="outerRadius" onChange="outerRadiusChange()" /></p>
+	<p id="innerRadius_container">Inner Raduis :<input type="text" id="innerRadius" name="innerRadius" onChange="innerRadiusChange()" /></p>
+	<p id="start_container">Start :<input type="text" id="start" name="start" onChange="startChange()" /></p>
+	<p id="end_container">End :<input type="text" id="end" name="end" onChange="endChange()" /></p>
+	<p id="w_container">Width :<input type="text" id="w" name="w" onChange="wChange()" /></p>
+	<p id="h_container">Height :<input type="text" id="h" name="h" onChange="hChange()" /></p>
+	<p id="nbBlocks_container">Number of Blocks :<input type="text" id="nbBlocks" name="nbBlocks" onChange="nbBlocksChange()" /></p>
+	<p id="darknessRatio_container">Background darkness ratio :<input type="text" id="darknessRatio" name="darknessRatio" onChange="darknessRatioChange()" /></p>
+	<p id="borderSize_container">Border Size :<input type="text" id="borderSize" name="borderSize" onChange="borderSizeChange()" />
+	<div id="borderColor_container" style="border:2px solid black; padding:2px;"><p>Border Color :</p>
+	<p>Red<input type="text" id="borderR" name="borderR" onChange="borderColorChange()" />Green<input type="text" id="borderG" name="borderG" onChange="borderColorChange()" />Blue<input type="text" id="borderB" name="borderB" onChange="borderColorChange()" /></p></div>
+	<p id="cursorSize_container">Cursor Size :<input type="text" id="cursorSize" name="cursorSize" onChange="cursorSizeChange()" /></p>
+	<p id="speed_container">Speed :<input type="text" id="speed" name="speed" onChange="speedChange()" /></p>
+	<p id="vertical_container">Vertical?<input type="checkbox" id="vertical" name="vertical" onChange="verticalChange()" /></p>
+	<p id="separateSections_container">Separate Sections?<input type="checkbox" id="separateSections" name="separateSections" onChange="separateSectionsChange()" /></p>
+	<div id="colorSection_container" style="border:2px solid black; padding:2px;"><p>Add a color section<p>
+	<p>Color:
+	Red<input type="text" id="newR" name="newR" onChange="checkValue(this, 0, 255, true)" />Green<input type="text" id="newG" name="newG" onChange="checkValue(this, 0, 255, true)" />Blue<input type="text" id="newB" name="newB" onChange="checkValue(this, 0, 255, true)" /></p>
+	<p>Section start :<input type="text" id="sectionstart" name="sectionstart" onChange="checkSection(this)" /></p>
+	<input type="submit" id="submitcolor" name="submitcolor" value="Add color section" onClick="addSection()" />
+	<input type="submit" id="removecolor" name="removecolor" value="Remove last color section" onClick="removeSection()" /></div>
+	<p>Here is the content of the buffer (won't appear on screen on the website)
+	<canvas id='buffer' width=500 height=600>
+		fallback content
+	</canvas>
+	</p>
+	</body>
+	<script language="javascript">init();</script>
+</html>
